@@ -74,23 +74,6 @@
 #
 # BLOG_USE_FEATURED_IMAGE = True
 
-# If ``True``, users will be automatically redirected to HTTPS
-# for the URLs specified by the ``SSL_FORCE_URL_PREFIXES`` setting.
-#
-# SSL_ENABLED = True
-
-# Host name that the site should always be accessed via that matches
-# the SSL certificate.
-#
-# SSL_FORCE_HOST = "www.example.com"
-
-# Sequence of URL prefixes that will be forced to run over
-# SSL when ``SSL_ENABLED`` is ``True``. i.e.
-# ('/admin', '/example') would force all URLs beginning with
-# /admin or /example to run over SSL. Defaults to:
-#
-# SSL_FORCE_URL_PREFIXES = ("/admin", "/account")
-
 # If True, the south application will be automatically added to the
 # INSTALLED_APPS setting.
 USE_SOUTH = True
@@ -139,7 +122,7 @@ SITE_ID = 1
 USE_I18N = False
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = "bf08a3bb-57a0-4136-a3a7-c0b10284fcb32df76bf0-7d47-40fd-9a79-3b7517f0220db5ab6e89-fb80-41e2-a4ec-a4850ef5b9fc"
+SECRET_KEY = "11cfbb9d-830e-4dfd-8628-071d8cea580d492291bd-d0b9-48a3-ac4f-a063e3638a2ab3c7c3cf-505e-45f2-8e62-5f8921c58bb5"
 
 # Tuple of IP addresses, as strings, that:
 #   * See debug comments, when DEBUG is true
@@ -258,8 +241,8 @@ INSTALLED_APPS = (
     "mezzanine.pages",
     "mezzanine.galleries",
     "mezzanine.twitter",
-    "mezzanine.accounts",
-    "mezzanine.mobile",
+    #"mezzanine.accounts",
+    #"mezzanine.mobile",
 )
 
 # List of processors used by RequestContext to populate the context.
@@ -292,8 +275,9 @@ MIDDLEWARE_CLASSES = (
     "mezzanine.core.middleware.TemplateForDeviceMiddleware",
     "mezzanine.core.middleware.TemplateForHostMiddleware",
     "mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware",
+    "mezzanine.core.middleware.SitePermissionMiddleware",
     # Uncomment the following if using any of the SSL settings:
-    "mezzanine.core.middleware.SSLRedirectMiddleware",
+    # "mezzanine.core.middleware.SSLRedirectMiddleware",
     "mezzanine.pages.middleware.PageMiddleware",
     "mezzanine.core.middleware.FetchFromCacheMiddleware",
 )
@@ -302,7 +286,6 @@ MIDDLEWARE_CLASSES = (
 # at the moment we are using custom forks of them.
 PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
 PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
-
 
 #########################
 # OPTIONAL APPLICATIONS #

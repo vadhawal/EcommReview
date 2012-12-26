@@ -1,5 +1,6 @@
 
 import os
+import re
 import sys
 from functools import wraps
 from getpass import getpass, getuser
@@ -212,6 +213,8 @@ def upload_template_and_reload(name):
             remote_data = sudo("cat %s" % remote_path, show=False)
     with open(local_path, "r") as f:
         local_data = f.read()
+        # Escape all non-string-formatting-placeholder occurrences of '%':
+        local_data = re.sub(r"%(?!\(\w+\)s)", "%%", local_data)
         if "%(db_pass)s" in local_data:
             env.db_pass = db_pass()
         local_data %= env
@@ -294,10 +297,12 @@ def python(code, show=True):
     Runs Python code in the project's virtual environment, with Django loaded.
     """
     setup = "import os; os.environ[\'DJANGO_SETTINGS_MODULE\']=\'settings\';"
+    full_code = 'python -c "%s%s"' % (setup, code.replace("`", "\\\`"))
     with project():
-        return run('python -c "%s%s"' % (setup, code), show=False)
+        result = run(full_code, show=False)
         if show:
             print_command(code)
+    return result
 
 
 def static():
@@ -305,7 +310,7 @@ def static():
     Returns the live STATIC_ROOT directory.
     """
     return python("from django.conf import settings;"
-                  "print settings.STATIC_ROOT")
+                  "print settings.STATIC_ROOT").split("\n")[-1]
 
 
 @task
@@ -388,8 +393,8 @@ def create():
                 sudo("openssl req -new -x509 -nodes -out %s -keyout %s "
                      "-subj '/CN=%s' -days 3650" % parts)
             else:
-                upload_template(crt_file, crt_local, use_sudo=True)
-                upload_template(key_file, key_local, use_sudo=True)
+                upload_template(crt_local, crt_file, use_sudo=True)
+                upload_template(key_local, key_file, use_sudo=True)
 
     # Set up project.
     upload_template_and_reload("settings")
@@ -398,7 +403,7 @@ def create():
             pip("-r %s/%s" % (env.proj_path, env.reqs_path))
         pip("gunicorn setproctitle south psycopg2 "
             "django-compressor python-memcached")
-        manage("createdb --noinput")
+        manage("createdb --noinput --nodata")
         python("from django.conf import settings;"
                "from django.contrib.sites.models import Site;"
                "site, _ = Site.objects.get_or_create(id=settings.SITE_ID);"
